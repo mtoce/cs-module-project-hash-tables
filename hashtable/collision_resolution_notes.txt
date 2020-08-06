@@ -1,0 +1,43 @@
+Collision resolution by chaining
+--------------------------------
+
+Make our array of slots into an array of linked lists.
+
+Each linked list node is a HashTableEntry.
+
+Put
+---
+
+Slot
+Index Chain (linked list)
+----- -------------------------------
+ 0    -> None
+ 1    {foo:12} -> None
+ 2    {baz:999} -> {bar:50} -> None
+ 3    -> None
+
+put("foo", 12)   # hashes to 1
+put("bar", 30)   # hashes to 2
+put("baz", 999)  # hashes to 2 -- collision
+put("bar", 50)   # hashes to 2 -- collision
+
+1. Figure out the index
+2. Search the linked list to see if the key is there
+2a. If the key is there, overwrite the value
+2b. If not there, create a new HashTableEntry and insert it in the list
+
+Get
+---
+
+1. Figure out the index for the key
+2. Search the linked list at the index for the HashTableEntry that matches the key
+3. Return the value for the entry, or None if not found
+
+
+Delete
+------
+
+1. Figure out the index for the key
+2. Search the linked list at the index for the HashTableEntry that matches the key
+2a. If found, delete the entry from the linked list--return the value
+2b. If not found, return None
