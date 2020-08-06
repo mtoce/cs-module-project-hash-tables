@@ -27,7 +27,7 @@ class HashTable:
         else:
             self.capacity = capacity
         
-        self.storage = [None for x in range(self.capacity)]
+        self.storage = [None for node in range(self.capacity)]
         self.count = 0
         self.loadfactor = 0
 
@@ -77,7 +77,7 @@ class HashTable:
 
         return h
 
-    def hash_idx(self, key):
+    def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer idx
         between within the storage capacity of the hash table.
@@ -93,7 +93,7 @@ class HashTable:
 
         Implement this.
         """
-        idx = self.hash_idx(key)
+        idx = self.hash_index(key)
         # self.storage[idx] = value
 
         # Case 1: no node at idx
@@ -127,7 +127,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        idx = self.hash_idx(key)
+        idx = self.hash_index(key)
         # If the key DNE in hash table, raise error
         if self.storage[idx] is None:
             raise LookupError('Key does not exist in hash table')
@@ -136,13 +136,13 @@ class HashTable:
         else:
             # if no key exists next after this key
             if self.storage[idx].next is None:
-                self.storage[loc] = None
+                self.storage[idx] = None
                 self.count -= 1
                 self.loadfactor = self.count / self.capacity
                 # Divide hashtable size by 2x if 20%- full
                 if self.loadfactor < 0.2:
                     self.resize(self.capacity / 2)
-            
+                return
             # if key exists after current key
             else:
                 # go down LL to delete correct node
@@ -165,6 +165,7 @@ class HashTable:
                         self.loadfactor = self.count / self.capacity
                         if self.loadfactor < 0.2:
                             self.resize(self.capacity / 2)
+                        return
                     cur = cur.next
                 # if the node wasn't found
                 raise LookupError('key was not found at location')
@@ -177,9 +178,20 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        idx = self.hash_idx(key)
+        idx = self.hash_index(key)
 
-        return self.storage[idx]
+        if self.storage[idx] is None:
+            return None
+        else:
+            cur = self.storage[idx]
+            # start traversing, check each node
+            while cur is not None:
+                # check each key
+                if cur.key == key:
+                    return cur.value
+                cur = cur.next
+            # not found at location
+            return None
 
     def resize(self, new_capacity):
         """
@@ -188,8 +200,20 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-        pass
+        # save old storage, go thru each node and rehash
+        old_storage = self.storage.copy()
+
+        self.capacity = int(new_capacity)
+        self.count = 0
+        
+        self.storage = [None for node in range(self.capacity)]
+        for node in old_storage:
+            while node is not None:
+                self.put(node.key, node.value)
+                node = node.next
+        
+        
+        return self.capacity
 
 
 if __name__ == "__main__":
